@@ -171,12 +171,17 @@ class SET_MLP_CIFAR10:
 
         return [rewiredWeights, weightMaskCore]
 
-    def weightsEvolution(self):
+    def weightsEvolution(self, epoch):
         # this represents the core of the SET procedure. It removes the weights closest to zero in each layer and add new random weights
         self.w1 = self.model.get_layer("sparse_1").get_weights()
         self.w2 = self.model.get_layer("sparse_2").get_weights()
         self.w3 = self.model.get_layer("sparse_3").get_weights()
         self.w4 = self.model.get_layer("dense_4").get_weights()
+
+        np.savetxt('weights/w1-%04d.np.gz' % epoch, self.w1[0])
+        np.savetxt('weights/w2-%04d.np.gz' % epoch, self.w2[0])
+        np.savetxt('weights/w3-%04d.np.gz' % epoch, self.w3[0])
+        np.savetxt('weights/w4-%04d.np.gz' % epoch, self.w4[0])
 
         self.wSRelu1 = self.model.get_layer("srelu1").get_weights()
         self.wSRelu2 = self.model.get_layer("srelu2").get_weights()
@@ -186,9 +191,20 @@ class SET_MLP_CIFAR10:
         [self.wm2, self.wm2Core] = self.rewireMask(self.w2[0], self.noPar2)
         [self.wm3, self.wm3Core] = self.rewireMask(self.w3[0], self.noPar3)
 
+        np.savetxt('weights/wm1-%04d.np.gz' % epoch, self.wm1)
+        np.savetxt('weights/wm2-%04d.np.gz' % epoch, self.wm2)
+        np.savetxt('weights/wm3-%04d.np.gz' % epoch, self.wm3)
+        np.savetxt('weights/wm1c-%04d.np.gz' % epoch, self.wm1Core)
+        np.savetxt('weights/wm2c-%04d.np.gz' % epoch, self.wm2Core)
+        np.savetxt('weights/wm3c-%04d.np.gz' % epoch, self.wm3Core)
+
         self.w1[0] = self.w1[0] * self.wm1Core
         self.w2[0] = self.w2[0] * self.wm2Core
         self.w3[0] = self.w3[0] * self.wm3Core
+
+        np.savetxt('weights/nw1-%04d.np.gz' % epoch, self.w1[0])
+        np.savetxt('weights/nw2-%04d.np.gz' % epoch, self.w2[0])
+        np.savetxt('weights/nw3-%04d.np.gz' % epoch, self.w3[0])
 
     def train(self):
 
@@ -228,7 +244,7 @@ class SET_MLP_CIFAR10:
             self.accuracies_per_epoch.append(historytemp.history['val_acc'][0])
 
             #ugly hack to avoid tensorflow memory increase for multiple fit_generator calls. Theano shall work more nicely this but it is outdated in general
-            self.weightsEvolution()
+            self.weightsEvolution(epoch)
             K.clear_session()
             self.create_model()
 
