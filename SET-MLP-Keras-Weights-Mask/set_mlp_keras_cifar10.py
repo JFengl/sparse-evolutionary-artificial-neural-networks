@@ -191,13 +191,6 @@ class SET_MLP_CIFAR10:
         [self.wm2, self.wm2Core] = self.rewireMask(self.w2[0], self.noPar2)
         [self.wm3, self.wm3Core] = self.rewireMask(self.w3[0], self.noPar3)
 
-        np.savetxt('weights/wm1-%04d.np.gz' % epoch, self.wm1)
-        np.savetxt('weights/wm2-%04d.np.gz' % epoch, self.wm2)
-        np.savetxt('weights/wm3-%04d.np.gz' % epoch, self.wm3)
-        np.savetxt('weights/wm1c-%04d.np.gz' % epoch, self.wm1Core)
-        np.savetxt('weights/wm2c-%04d.np.gz' % epoch, self.wm2Core)
-        np.savetxt('weights/wm3c-%04d.np.gz' % epoch, self.wm3Core)
-
         self.w1[0] = self.w1[0] * self.wm1Core
         self.w2[0] = self.w2[0] * self.wm2Core
         self.w3[0] = self.w3[0] * self.wm3Core
